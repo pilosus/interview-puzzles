@@ -116,6 +116,6 @@ if __name__ == '__main__':
     except:
         days = 365
     menu = generate_menu2(days)
-    for i, e in enumerate(menu):
-        print("     ============ Day {0} Menu =============".format(i))
-        print(e)
+    for e, i in enumerate(menu):
+        print("     ============ Day {0} Menu =============".format(e + 1))
+        print(i)
