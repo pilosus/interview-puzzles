@@ -3,6 +3,7 @@
 import random
 import bisect
 import itertools
+import sys
 
 ### Constants
 MAINS = {'chicken': 0.3, 'beef': 0.3, 'fish': 0.25, 'pork': 0.15}
@@ -24,13 +25,13 @@ PLATE =  """
      %%   %%      '-.,___,.-'      %%  %%
 
      ======= PLAT DU JOUR, OLA-LA! ======
-             1. {0}
-             2. {1}
-             3. {2}
+             Main course: {0}
+             Side dish: {1}
+             Snacks: {2}
 """
 
 class Menu(object):
-    """Menu consists of a main dish, side dish and a snack."""
+    """Menu consists of a main course, side dish and a snack."""
 
     def __init__(self, main, staple, snack):
         self.main = main
@@ -109,6 +110,12 @@ def generate_menu2(days: int) -> [Menu]:
     return menu_list
 
 if __name__ == '__main__':
-    menu = generate_menu2(365)
-    for i in menu:
-        print(i)
+    args = sys.argv[1:]
+    try:
+        days = int(args[0])
+    except:
+        days = 365
+    menu = generate_menu2(days)
+    for i, e in enumerate(menu):
+        print("     ============ Day {0} Menu =============".format(i))
+        print(e)
