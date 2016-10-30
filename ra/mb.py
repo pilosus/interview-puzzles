@@ -11,7 +11,8 @@ class methods, and commenting.
 The code below follows PEP8 style guide for Python code and
 checked against pep8 tool.
 
-Total coding time for ma and mb modules: 59 minutes.
+Coding time for ma and mb modules: 59 minutes.
+Commenting time: ca. 30 min.
 Text editor: GNU/Emacs
 """
 
