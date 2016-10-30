@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-ma is a module for Ramax International's interview test problem.
+ma is a module for the interview problem.
 
 This module shows the use of class inheritance in Python, setting and
 getting object's attributes, as well as throwing exceptions.

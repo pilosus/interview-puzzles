@@ -3,7 +3,7 @@
 from ma import Second
 
 """
-mb is a module for Ramax International's interview test problem.
+mb is a module for the interview test problem.
 
 This module shows the use of class inheritance in Python, defining
 class methods, and commenting.
