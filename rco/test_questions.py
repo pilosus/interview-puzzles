@@ -1,7 +1,7 @@
 import unittest
 import sys
 from contextlib import contextmanager
-from StringIO import StringIO
+from io import StringIO
 
 import questions as q
 from models import *
@@ -191,9 +191,7 @@ class InterviewTestCase(unittest.TestCase):
         self.assertEqual(q.mc1.USELESS_METHOD(), (1, 2))
 
         with self.assertRaises(TypeError):
-            class NotEnoughDocs(object):
-                __metaclass__ = q.DocStrMeta
-
+            class NotEnoughDocs(object, metaclass=q.DocStrMeta):
                 def __init__(self, make, model, color):
                     self.make = make
                     self.model = model
@@ -205,12 +203,14 @@ class InterviewTestCase(unittest.TestCase):
                 def start_engine(self):
                     print("Changing engine")
 
-        class EnoughDocs(object):
-            __metaclass__ = q.DocStrMeta
+        class EnoughDocs(object, metaclass=q.DocStrMeta):
             pass
 
         enough = EnoughDocs()
-        self.assertEqual(enough.__metaclass__, q.DocStrMeta)
+
+        self.assertEqual(enough.__class__.__class__.__name__, "DocStrMeta")
+        # we are no intended to unit-test Python itself here! Use as a reminder
+        self.assertEqual(enough.__class__.__class__, q.DocStrMeta)
 
 
     def test_function_decorators(self):
@@ -259,6 +259,17 @@ class InterviewTestCase(unittest.TestCase):
         self.assertIn(d3, q2)
         self.assertNotIn(d1, q2)
         self.assertNotIn(d2, q2)
+
+    def test_class_based_decorators(self):
+        @q.DecoratorClass(q.CustomException)
+        def mult(a, b):
+            return a * b
+
+        with self.assertRaises(q.CustomException):
+            mult(-10, 5)
+
+        self.assertEqual(mult(2, 3), 6)
+
 
     def test_context_manager(self):
         self.fail('Finish the tests!')

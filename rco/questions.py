@@ -12,6 +12,31 @@ def fun(x, l=[]):
     return l
 
 """
+### Class-based decorators
+"""
+
+
+class CustomException(ValueError):
+    pass
+
+
+class DecoratorClass(object):
+    def __init__(self, exception, *args, **kwargs):
+        self.exception = exception
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self, f):
+        def wrap(*args, **kwargs):
+            result = f(*args, **kwargs)
+            if result < 0:
+                raise self.exception
+            return result
+        return wrap
+
+
+
+"""
 ### Function decorators ###
 
 http://www.python-course.eu/python3_decorators.php
@@ -243,51 +268,42 @@ mc1 = MyClass()
 
 
 # yet another metaclass
-
 class DocStrMeta(type):
     """
     Metaclass subclassed from type metaclass.
 
     Makes sure all methods (except for private and non-callable ones) have docstring.
     """
+    def __init__(self, name, bases, attrs):
+        nodocs = []
+        for key, value in attrs.items():
+            # skip special and private methods
+            if key.startswith("__"): continue
+            # skip any non-callable
+            if not hasattr(value, "__call__"): continue
+            # check for a doc string. a better way may be to store
+            # all methods without a docstring then throw an error showing
+            # all of them rather than stopping on first encounter
+            if not getattr(value, '__doc__'):
+                nodocs.append(key)
+                #raise TypeError("%s must have a docstring" % key)
 
-    def __new__(cls, name, bases, attrs):
-        no_docs = []
+        if nodocs:
+            methods_without_docstr = ", ".join(nodocs)
+            raise TypeError("Methods {0} have no docstring!".format(methods_without_docstr))
 
-        for key, val in attrs.items():
-            # skip if it's a special method or non-callable
-            if key.startswith("__"):
-                continue
-
-            if not hasattr(val, "__call__"):
-                continue
-
-            # if method has no __doc__, then add it to the list,
-            # raise exception, once all methods checked
-            # and at least one method lacks
-            try:
-                result = getattr(val, '__doc__')
-                if not result:
-                    no_docs.append(key)
-            except Exception as err:
-                pass
-
-        if no_docs:
-            list_as_str = ', '.join(no_docs)
-            raise TypeError("Methods: {0} have no docstring!".format(list_as_str))
-
-        return super(DocStrMeta, cls).__new__(cls, name, bases, attrs)
+        type.__init__(self, name, bases, attrs)
 
 
-class EnoughDocs(object):
-
-    __metaclass__ = DocStrMeta
+class EnoughDocs(object, metaclass=DocStrMeta):
+    # __metaclass__ field used in Python 2.x. but disallowed in Python 3.x
+    # use keyword argument metaclass for a class instead
+    #__metaclass__ = DocStrMeta
 
     def __init__(self, a, b, c):
         self.a = a
         self.b = b
         self.c = c
-
 
     def geta(self):
         """
@@ -306,6 +322,25 @@ class EnoughDocs(object):
         """
         self.a = newa
 
+"""
+class NotEnoughDocs(object, metaclass=DocStrMeta):
+    # __metaclass__ field used in Python 2.x, but disallowed in Python 3
+    # for Python 3 use keyword argument `metaclass`
+    #__metaclass__ = DocStrMeta
+
+    def __init__(self, a, b, c):
+        self.a = a
+        self.b = b
+        self.c = c
+
+    def geta(self):
+        return self.a
+
+    def seta(self, newa):
+        self.a = newa
+
+n = NotEnoughDocs(1, 2, 3)
+"""
 
 """
 __call__ method
