@@ -1,5 +1,9 @@
 import random
 import logging
+import urllib.request
+from contextlib import ContextDecorator, contextmanager
+from time import time
+
 
 """
 ### Global and local variables. Scope ###
@@ -364,4 +368,49 @@ class Factorial:
             else:
                 self.cache[n] = n * self.__call__(n - 1)
         return self.cache[n]
+
+"""
+### Context manager
+See also:
+https://jeffknupp.com/blog/2016/03/07/python-with-context-managers/
+"""
+
+class UrlRetriever():
+    def __init__(self, url):
+        self.url = url
+
+    def __enter__(self):
+        self.local_filename, self.headers = urllib.request.urlretrieve(self.url)
+        self.response = open(self.local_filename)
+        return self.response
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.response.close()
+
+"""
+### contextlib
+See also
+https://docs.python.org/3/library/contextlib.html
+https://gist.github.com/bradmontgomery/4f4934893388f971c6c5
+"""
+
+
+@contextmanager
+def opener(url='http://www.python.org'):
+    print('Start')
+    yield urllib.request.urlopen(url)
+    print('Stop')
+
+
+class TimeElapsed(ContextDecorator):
+    def __enter__(self):
+        self.start = time()
+        print("Start time: {}".format(self.start))
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop = time()
+        elapsed = self.stop - self.start
+        print("Stop time: {0}".format(self.stop))
+        print("Time elapsed: {0}".format(elapsed))
 

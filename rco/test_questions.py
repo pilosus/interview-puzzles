@@ -2,6 +2,7 @@ import unittest
 import sys
 from contextlib import contextmanager
 from io import StringIO
+from time import sleep
 
 import questions as q
 from models import *
@@ -270,9 +271,29 @@ class InterviewTestCase(unittest.TestCase):
 
         self.assertEqual(mult(2, 3), 6)
 
-
     def test_context_manager(self):
-        self.fail('Finish the tests!')
+        with q.UrlRetriever('http://python.org/') as html:
+            self.assertIn('Welcome to Python.org', html.read())
+
+    def test_contextlib(self):
+        with q.opener('http://www.python.org') as page:
+            self.assertIn(b'Welcome to Python.org', page.read())
+        # capture output first
+        with captured_output() as (out, err):
+            # now use ContextManager
+            with q.TimeElapsed():
+                sleep(1)
+                print("...")
+                sleep(1)
+
+        output = out.getvalue().strip()
+        self.assertIn("Start time", output)
+        self.assertIn("Stop time", output)
+        self.assertIn("Time elapsed", output)
+
+
+
+        #self.fail('Finish the tests!')
 
 
 if __name__ == '__main__':
